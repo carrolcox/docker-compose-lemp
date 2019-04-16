@@ -1,0 +1,44 @@
+FROM php:7-fpm-alpine
+
+RUN docker-php-ext-install \
+    # bcmath \
+    # bz2 \
+    # calendar \
+    # dba \
+    # enchant \
+    # exif \
+    # gd \
+    # gettext \
+    # gmp \
+    # imap \
+    # interbase \
+    # intl \
+    # ldap \
+    mysqli \
+    # oci8 \
+    # odbc \
+    # opcache \
+    # pcntl \
+    # pdo_dblib \
+    # pdo_firebird \
+    pdo_mysql \
+    # pdo_oci \
+    # pdo_odbc \
+    # pdo_pgsql \
+    # pdo_sqlite \
+    # pgsql \
+    # pspell \
+    # recode \
+    # shmop \
+    # snmp \
+    # soap \
+    # sockets \
+    # sysvmsg \
+    # sysvsem \
+    # sysvshm \
+    # tidy \
+    # wddx \
+    # xmlrpc \
+    # xsl \
+    # zend_test \
+    << "/dev/null"

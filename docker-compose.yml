@@ -1,0 +1,69 @@
+version: "3.6"
+
+services:
+  web:
+    image: nginx:1.15-alpine
+    restart: always
+    ports:
+      - 8080:80
+      - 8433:433
+    volumes:
+      - ./conf/nginx:/etc/nginx/conf.d/:ro
+      - ./logs/nginx:/var/log/nginx/:rw
+      - ./www:/srv/www/:ro
+    networks:
+      - www
+    depends_on:
+      - phpfpm
+          
+  phpfpm:
+    # image: php:7-fpm-alpine
+    image: local/php7
+    build:
+      context: .
+      dockerfile: dockerfile.php7-custom
+      cache_from:
+        - local/php7
+        - php:7-fpm-alpine
+    restart: always
+    volumes:
+      - ./conf/phpfpm/custom.ini:/usr/local/etc/php/conf.d/40-custom.ini:ro
+      - ./logs/phpfpm:/var/log/php-fpm/:rw
+      - ./www:/srv/www/:ro
+    networks:
+      - www
+    env_file: .env
+    depends_on:
+      - mysql
+
+  mysql:
+    image: percona/percona-server:5.7
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./logs/mysql:/var/log/mysql/:rw
+      - ./sql:/docker-entrypoint-initdb.d/:ro
+      - dbdata:/var/lib/mysql/:rw
+    networks:
+      - www
+    env_file: .env
+    environment:
+      CHARACTER_SET_SERVER: 'utf8'
+      COLLATION_SERVER: 'utf8_general_ci'
+    
+  adminer:
+    image: adminer:4.7-standalone
+    restart: always
+    ports:
+      - 8081:8080
+    networks:
+      - www
+    depends_on:
+      - mysql
+
+volumes:
+  dbdata:
+
+networks:
+  www:
