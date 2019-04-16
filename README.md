@@ -1,7 +1,10 @@
 # docker-compose-lemp
 
 Docker compose php-fpm nginx mysql sample.
-Based on [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/markshust/docker-nginx-phpfpm-percona-alpine.git)
+Based on:
+
+* [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/markshust/docker-nginx-phpfpm-percona-alpine.git)
+* 
 
 ## Requirements
 
@@ -29,13 +32,13 @@ Based on [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/marks
     └── phpinfo.php # show phpinfo()
 ```
 
-## Start
+## First start or recreate
 
 ### update images
 
  `docker-compose pull --include-deps --ignore-pull-failures`
 
-## build custom images
+### build custom images
  
  `docker-compose build --pull`
 
@@ -46,3 +49,13 @@ Based on [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/marks
 ### stop with recreates
 
  `docker-compose down -v --remove-orphans`
+
+## Usage
+
+### start group
+
+ `docker-compose up -d`
+
+### stop group
+
+ `docker-compose down`
