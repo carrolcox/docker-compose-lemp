@@ -20,7 +20,8 @@ Based on:
 │   ├── nginx # config for nginx vhost
 │   │   └── default.conf
 │   └── phpfpm # config for phpfpm
-│       └── custom.ini
+│       ├── zz-docker.conf
+│       └── zz-docker.ini
 ├── docker-compose.yml
 ├── dockerfile.php7-custom # custom buildfile for local/php7 image
 ├── .env
