@@ -4,7 +4,7 @@ Docker compose php-fpm nginx mysql sample.
 Based on:
 
 * [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/markshust/docker-nginx-phpfpm-percona-alpine.git)
-* 
+* [khs1994-docker/lnmp](https://github.com/khs1994-docker/lnmp)
 
 ## Requirements
 
@@ -39,7 +39,7 @@ Based on:
  `docker-compose pull --include-deps --ignore-pull-failures`
 
 ### build custom images
- 
+
  `docker-compose build --pull`
 
 ### start group with recreates

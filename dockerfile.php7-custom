@@ -1,5 +1,6 @@
 FROM php:7-fpm-alpine
 
+## Install and enable ext
 RUN docker-php-ext-install \
     # bcmath \
     # bz2 \
@@ -25,7 +26,6 @@ RUN docker-php-ext-install \
     # pdo_oci \
     # pdo_odbc \
     # pdo_pgsql \
-    # pdo_sqlite \
     # pgsql \
     # pspell \
     # recode \
