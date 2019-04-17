@@ -15,42 +15,41 @@ services:
       - 8080:80
       - 8433:433
     volumes:
-      - ./conf/nginx:/etc/nginx/conf.d/:ro
-      - ./logs/nginx:/var/log/nginx/:rw
-      - ./www:/srv/www/:ro
+      - ./conf/nginx:/etc/nginx/conf.d/:ro,cached
+      - ./logs/nginx:/var/log/nginx/:rw,cached
+      - ./www:/srv/www/:ro,cached
     depends_on:
       - phpfpm
           
   phpfpm:
     <<: *defaults
     # image: php:7-fpm-alpine
-    image: local/php7
+    image: local/php:latest
     build:
       context: .
-      dockerfile: dockerfile.php7-custom
+      dockerfile: dockerfile.php
       cache_from:
-        - local/php7
+        - local/php:latest
         - php:7-fpm-alpine
+    expose:
+      - 9000
     volumes:
-      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro
-      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro
-      - ./logs/phpfpm:/var/log/php-fpm/:rw
-      - ./www:/srv/www/:ro
+      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro,cached
+      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro,cached
+      - ./logs/phpfpm:/var/log/php-fpm/:rw,cached
+      - ./www:/srv/www/:ro,cached
     depends_on:
       - mysql
 
   mysql:
     <<: *defaults
     image: percona/percona-server:5.7
-    ports:
-      - 3306:3306
+    expose:
+      - 3306
     volumes:
-      - ./logs/mysql:/var/log/mysql/:rw
-      - ./sql:/docker-entrypoint-initdb.d/:ro
-      - dbdata:/var/lib/mysql/:rw
-    environment:
-      CHARACTER_SET_SERVER: 'utf8'
-      COLLATION_SERVER: 'utf8_general_ci'
+      - ./logs/mysql:/var/log/:rw,cached
+      - ./sql:/docker-entrypoint-initdb.d/:ro,cached
+      - dbdata:/var/lib/mysql/:rw,cached
     
   adminer:
     <<: *defaults
@@ -65,3 +64,6 @@ volumes:
 
 networks:
   www:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br-www
