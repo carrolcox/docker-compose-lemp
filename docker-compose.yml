@@ -1,9 +1,20 @@
-version: "3.6"
+version: "3.7"
 
-x-defaults:
-  &defaults
-  restart: always
+x-defaults: &defaults
   env_file: .env
+  deploy:
+    resources:
+      limits:
+        cpus: '1.25'
+        memory: 500M
+      reservations:
+        cpus: '0.25'
+        memory: 100M
+    restart_policy:
+      condition: on-failure
+      delay: 3s
+      max_attempts: 5
+      window: 120s
   networks:
     - www
 
@@ -23,11 +34,10 @@ services:
           
   phpfpm:
     <<: *defaults
-    # image: php:7-fpm-alpine
     image: local/php:latest
     build:
       context: .
-      dockerfile: dockerfile.php
+      dockerfile: dockerfile.build-php
       cache_from:
         - local/php:latest
         - php:7-fpm-alpine
@@ -50,14 +60,6 @@ services:
       - ./logs/mysql:/var/log/:rw,cached
       - ./sql:/docker-entrypoint-initdb.d/:ro,cached
       - dbdata:/var/lib/mysql/:rw,cached
-    
-  adminer:
-    <<: *defaults
-    image: adminer:4.7-standalone
-    ports:
-      - 8081:8080
-    depends_on:
-      - mysql
 
 volumes:
   dbdata:
