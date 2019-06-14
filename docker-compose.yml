@@ -5,16 +5,19 @@ x-defaults: &defaults
   deploy:
     resources:
       limits:
-        cpus: '1.25'
-        memory: 500M
-      reservations:
-        cpus: '0.25'
-        memory: 100M
+        cpus: '0.75'
+        memory: 600M
     restart_policy:
       condition: on-failure
-      delay: 3s
       max_attempts: 5
-      window: 120s
+  sysctls:
+    net.core.somaxconn: 4096
+    net.ipv4.tcp_syncookies: 0
+  ulimits:
+    nproc: 65536
+    nofile:
+      soft: 32768
+      hard: 65536
   networks:
     - www
 
@@ -26,9 +29,9 @@ services:
       - 8080:80
       - 8433:433
     volumes:
-      - ./conf/nginx:/etc/nginx/conf.d/:ro,cached
-      - ./logs/nginx:/var/log/nginx/:rw,cached
-      - ./www:/srv/www/:ro,cached
+      - ./conf/nginx:/etc/nginx/conf.d/:ro,consistent
+      - ./logs/nginx:/var/log/nginx/:rw,consistent
+      - ./www:/srv/www/:ro,consistent
     depends_on:
       - phpfpm
           
@@ -44,10 +47,10 @@ services:
     expose:
       - 9000
     volumes:
-      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro,cached
-      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro,cached
-      - ./logs/phpfpm:/var/log/php-fpm/:rw,cached
-      - ./www:/srv/www/:ro,cached
+      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro,consistent
+      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro,consistent
+      - ./logs/phpfpm:/var/log/php-fpm/:rw,consistent
+      - ./www:/srv/www/:ro,consistent
     depends_on:
       - mysql
 
@@ -57,12 +60,12 @@ services:
     expose:
       - 3306
     volumes:
-      - ./logs/mysql:/var/log/:rw,cached
-      - ./sql:/docker-entrypoint-initdb.d/:ro,cached
-      - dbdata:/var/lib/mysql/:rw,cached
+      - ./logs/mysql:/var/log/:rw,consistent
+      - ./sql:/docker-entrypoint-initdb.d/:ro,consistent
+      - mysql-data:/var/lib/mysql/:rw,consistent
 
 volumes:
-  dbdata:
+  mysql-data: {}
 
 networks:
   www:
