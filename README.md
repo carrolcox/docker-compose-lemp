@@ -1,20 +1,20 @@
 # docker-compose-lemp
 
-Docker compose php-fpm nginx mysql sample.
+Docker compose php-fpm nginx mysql sample progect.
 
 Based on:
 
-* [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/markshust/docker-nginx-phpfpm-percona-alpine.git)
-* [khs1994-docker/lnmp](https://github.com/khs1994-docker/lnmp)
+- [markshust/docker-nginx-phpfpm-percona-alpine](https://github.com/markshust/docker-nginx-phpfpm-percona-alpine.git)
+- [khs1994-docker/lnmp](https://github.com/khs1994-docker/lnmp)
 
 ## Requirements
 
-* [Docker](https://docs.docker.com/install/)
-* [Docker compose](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/install/)
+- [Docker compose](https://docs.docker.com/compose/install/)
 
 ## Directories
 
-```bash
+```shell
 ├── conf
 │   ├── mysql # config for mysql
 │   ├── nginx # config for nginx vhost
@@ -26,6 +26,7 @@ Based on:
 ├── dockerfile.build-php # custom buildfile for local/php image
 ├── .env # environment file
 ├── logs # logs from services
+├── private # some private data
 ├── README.md
 ├── sql # .sql or .sql.tgz files to import
 └── www # for web progect, index.php required
@@ -38,66 +39,79 @@ Based on:
 
 ### start group
 
-`docker-compose --compatibility up -d`
+```shell
+docker-compose --compatibility up -d
+```
 
 Options:
 
-* `--compatibility`         Compose will attempt to convert keys in v3 files to their non-Swarm equivalent
-* `-d`, `--detach`          Detached mode; run containers in the background.
+- `--compatibility` Compose will attempt to convert keys in v3 files to their non-Swarm equivalent
+- `-d`, `--detach` Detached mode; run containers in the background.
 
 ### stop group
 
-`docker-compose down`
+```shell
+docker-compose down
+```
 
 ## First start or recreate
 
 ### update images from registry
 
-`docker-compose pull --include-deps --ignore-pull-failures`
+```shell
+docker-compose pull --include-deps --ignore-pull-failures
+```
 
 Options:
 
-* `--ignore-pull-failures`  Pull what it can and ignores images with pull failures.
-* `--include-deps`          Pull services declared as dependencies.
-
+- `--ignore-pull-failures` Pull what it can and ignores images with pull failures.
+- `--include-deps` Pull services declared as dependencies.
 
 ### build local images
 
-`docker-compose build --force-rm --no-cache --pull`
+```shell
+docker-compose build --force-rm --no-cache --pull
+```
 
 Options:
 
-* `--force-rm`              Always remove intermediate containers.
-* `--no-cache`              Do not use cache when building the image.
-* `--pull`                  Always attempt to pull a newer version of the image.
+- `--force-rm` Always remove intermediate containers.
+- `--no-cache` Do not use cache when building the image.
+- `--pull` Always attempt to pull a newer version of the image.
 
 ### start group with orphans clean and recreates
 
-`docker-compose --compatibility up -d --remove-orphans --force-recreate --always-recreate-deps`
+```shell
+docker-compose --compatibility up -d --remove-orphans --force-recreate --always-recreate-deps
+```
 
 Options:
 
-* `--compatibility`         Compose will attempt to convert keys in v3 files to their non-Swarm equivalent
-* `-d`, `--detach`          Detached mode; run containers in the background.
-* `--force-recreate`        Recreate containers even if their configuration and image haven't changed.
-* `--always-recreate-deps`  Recreate dependent containers.
-* `--remove-orphans`        Remove containers for services not defined
+- `--compatibility` Compose will attempt to convert keys in v3 files to their non-Swarm equivalent
+- `-d`, `--detach` Detached mode; run containers in the background.
+- `--force-recreate` Recreate containers even if their configuration and image haven't changed.
+- `--always-recreate-deps` Recreate dependent containers.
+- `--remove-orphans` Remove containers for services not defined
 
 ### stop with orphans clean
 
-`docker-compose down --remove-orphans`
+```shell
+docker-compose down --remove-orphans
+```
 
 Options:
 
-* `-v`, `--volumes`         Remove named volumes declared in the `volumes` section of the Compose file and anonymous volumes attached to containers.
-* `--remove-orphans`        Remove containers for services not defined in the Compose file.
+- `-v`, `--volumes` Remove named volumes declared in the `volumes` section of the Compose file and anonymous volumes attached to containers.
+- `--remove-orphans` Remove containers for services not defined in the Compose file.
 
 ## Check orphans and clean it
 
-`docker system prune --all --force --volumes`
+```shell
+docker system prune --all --force --volumes
+```
 
 Options:
 
-* `-a`, `--all`             Remove all unused images not just dangling ones.
-* `-f`, `--force`           Do not prompt for confirmation.
-* `--volumes`               Prune volumes.
+- `-a`, `--all` Remove all unused images not just dangling ones.
+- `-f`, `--force` Do not prompt for confirmation.
+- `--volumes` Prune volumes.

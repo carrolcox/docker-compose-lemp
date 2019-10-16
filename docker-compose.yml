@@ -1,41 +1,31 @@
 version: "3.7"
 
 x-defaults: &defaults
-  env_file: .env
+  env_file:
+    - ${ENV_FILE:-environment}
   deploy:
     resources:
       limits:
-        cpus: '0.75'
-        memory: 600M
+        cpus: "0.75"
+        memory: 512M
     restart_policy:
-      condition: on-failure
-      max_attempts: 5
+      condition: any
   sysctls:
-    net.core.somaxconn: 4096
+    net.core.somaxconn: 16384
     net.ipv4.tcp_syncookies: 0
   ulimits:
     nproc: 65536
     nofile:
       soft: 32768
       hard: 65536
+    memlock:
+      soft: -1
+      hard: -1
   networks:
-    - www
+    - net
 
 services:
-  web:
-    <<: *defaults
-    image: nginx:1.15-alpine
-    ports:
-      - 8080:80
-      - 8433:433
-    volumes:
-      - ./conf/nginx:/etc/nginx/conf.d/:ro,consistent
-      - ./logs/nginx:/var/log/nginx/:rw,consistent
-      - ./www:/srv/www/:ro,consistent
-    depends_on:
-      - phpfpm
-          
-  phpfpm:
+  app:
     <<: *defaults
     image: local/php:latest
     build:
@@ -47,28 +37,41 @@ services:
     expose:
       - 9000
     volumes:
-      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro,consistent
-      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro,consistent
+      - ./www:/srv/www/:rw,consistent
       - ./logs/phpfpm:/var/log/php-fpm/:rw,consistent
-      - ./www:/srv/www/:ro,consistent
+      - ./conf/phpfpm/zz-docker.conf:/usr/local/etc/php-fpm.d/zz-docker.conf:ro
+      - ./conf/phpfpm/zz-docker.ini:/usr/local/etc/php/conf.d/zz-docker.ini:ro
     depends_on:
-      - mysql
+      - db
 
-  mysql:
+  db:
     <<: *defaults
-    image: percona/percona-server:5.7
+    image: percona/percona-server:${DB_TAG:-5.7}
     expose:
       - 3306
     volumes:
-      - ./logs/mysql:/var/log/:rw,consistent
-      - ./sql:/docker-entrypoint-initdb.d/:ro,consistent
       - mysql-data:/var/lib/mysql/:rw,consistent
+      - ./logs/mysql:/var/log/:rw,consistent
+      - ./sql:/docker-entrypoint-initdb.d/:ro
+
+  lb:
+    <<: *defaults
+    image: nginx:${LB_TAG:-1.14-alpine}
+    ports:
+      - 8080:80
+      - 8433:433
+    volumes:
+      - ./logs/nginx:/var/log/nginx/:rw,consistent
+      - ./conf/nginx:/etc/nginx/conf.d/:ro
+      - ./www:/srv/www/:ro
+    depends_on:
+      - app
 
 volumes:
   mysql-data: {}
 
 networks:
-  www:
+  net:
     driver: bridge
     driver_opts:
       com.docker.network.bridge.name: br-www

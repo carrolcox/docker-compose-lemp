@@ -1,5 +1,7 @@
-private/
+!logs/*/.placeholder
 logs/*/
+!private/.placeholder
+private/
 *~
 *.sw?
 *.*sw?
